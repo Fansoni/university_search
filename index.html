@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ermelindo</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-xs-10 col-xs-offset-1">
+            <h1>Busca Universidades</h1>
+            <p>Permitir buscar universidades a nível do globo utilizando a API: <a href="https://github.com/Hipo/university-domains-list">University Domains List</a></p>
+            <br>
+            <div class="row">
+                <div class="col-md-8 col-xs-8">
+                    <input type="text" name="search" id="search" class="form-control">
+
+                </div>
+                <button id="search-button" class="btn btn-primary col-md-4 col-xs-4">
+                    <i class="glyphicon glyphicon-search"></i>
+                    Pesquisar
+                </button>
+            </div>
+            <br>
+            <img id="loading" src="./Spinner-5.gif" alt="loading">
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-responsive table-striped table-hover col-md-12">
+                        <thead>
+                            <th class="text-center">#</th>
+                            <th>Name</th>
+                            <th>Country</th>
+                            <th>Web Page</th>
+                        </thead>
+                        <tbody id="result-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#loading').hide();
+        $('#search').val('agostinho'); //Atribui um falor a input de busca
+
+        /*
+            Função responsável pela busca quando chamando o evento 'onclick'.
+
+            Podes fazer de maneira diferente colocando o atributo 'onclick' no html
+            e chamar uma função específica já criada. Exemplo:
+
+            --html
+            <button onclick="chamaFuncao()" >CLique aqui</button>
+
+            --script js
+            chamaFuncao(){
+                --coloque aqui todo o código do ajax
+            }
+
+            Existe ainda outra forma de fazer isso que é por meio de um formulário:
+
+            <form onSubmit="event.preventDefault(); chamaFuncao();"></form>
+            ou
+            <form onSubmit="chamaFuncao();"></form>
+
+            chamaFuncao(){
+                event.preventDefault(); 
+                --código Ajax
+            }
+            
+        */
+        $('#search-button').on('click', function() {
+            var text = $('#search').val(); //Pega o valor do input
+            var url = 'http://universities.hipolabs.com/search?name=' + text;
+            console.log(url);
+
+            $('#result-body').empty();
+            $('#loading').show(); // mostrar loading gif
+
+            //Forma simples de usar o Get do Ajax
+            $.get(url, function(data, status){
+                if(data.length == 0){
+                    $('#result-body').append(`
+                        <tr>
+                            <td colspan="4" class="text-center">Sem resultados</td> 
+                        </tr>
+                    `);
+                }else{
+                    for (let index = 0; index < data.length; index++) {
+                        const element = data[index];
+                        console.log(element);
+                        //Adicionar o resultado no tbody da table
+                        $('#result-body').append(`
+                            <tr>
+                                <td class="text-center">${ index + 1 }</td>
+                                <td>${ element.name }</td>
+                                <td>${ element.country }</td>
+                                <td>
+                                    <a href="http://${ element.domains[0] }">${ element.domains[0] }</a>
+                                </td>
+                            </tr>
+                        `);
+                    }
+                }
+                $('#loading').hide(); // ocultar loading gif
+            });
+
+            //Forma Genérica de utilização do Ajax
+            // $.ajax(
+            //     {
+            //         url: url, 
+            //         type: 'GET',
+            //         success: function(response){
+            //             console.log('success Forma Genérica Ajax');
+            //             console.log(response);
+            //         },
+            //         error: function(error){
+            //             console.log('error Forma Genérica Ajax');
+            //             console.log(error);
+            //         }
+            //     }
+            // );
+        });
+    </script>
+</body>
+</html>
